@@ -77,6 +77,8 @@ The client supports actions for two main services:
 *   `update_registered_agent`: Updates an existing agent registration.
 *   `get_registered_agents_by_name`: Retrieves registered agents by their display name.
 *   `unregister_agent`: Unregisters an agent.
+*   `create_authorization`: Creates an OAuth authorization resource.
+*   `delete_authorization`: Deletes an OAuth authorization resource.
 
 **Agent Engine Manager (AEM) Actions (for Vertex AI Agent Engine):**
 *   `list_deployed_agents`: Lists all agents deployed on Vertex AI Agent Engine.
@@ -98,12 +100,16 @@ The following options can be used to provide parameters:
 **For Agent Registry Service (ARS):**
 *   `--app_id <app_id>`: The App ID (e.g., your Agentspace application ID).
 *   `--agent_id <agent_id>`: The Agent ID assigned by the Agent Registry Service (used for `get_registered_agent`, `update_registered_agent`, `unregister_agent`).
-*   `--ars_display_name <display_name>`: Agent display name for the registry.
+*   `--ars_display_name <display_name>`: Agent display name for the registry (for `register_agent`, `update_registered_agent`, `get_registered_agents_by_name`).
 *   `--description <description>`: Agent description for the registry.
 *   `--tool_description <tool_description>`: Tool description for the registry.
 *   `--adk_deployment_id <adk_deployment_id>`: The Reasoning Engine ID from the agent's deployment on Vertex AI Agent Engine. Example: if Reasoning Engine is `projects/PROJECT_ID/locations/LOCATION/reasoningEngines/RE_ID`, then this is `RE_ID`.
-*   `--auth_id <auth_id>`: Authorization ID (optional, for agents acting on behalf of users).
+*   `--auth_id <auth_id>`: Authorization ID (for `register_agent`, `update_registered_agent`, `create_authorization`, `delete_authorization`).
 *   `--icon_uri <icon_uri>`: URI for the agent's icon (optional).
+*   `--oauth_client_id <client_id>`: OAuth Client ID for authorization.
+*   `--oauth_client_secret <client_secret>`: OAuth Client Secret for authorization.
+*   `--oauth_auth_uri <auth_uri>`: OAuth Authorization URI for authorization.
+*   `--oauth_token_uri <token_uri>`: OAuth Token URI for authorization.
 *   `--api_location <api_location>`: API location for the Agent Registry Service (default: `global`). See Discovery Engine locations.
 *   `--re_location <re_location>`: Location of the Reasoning Engine and Authorizations (default: `global`).
 

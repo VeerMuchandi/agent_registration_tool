@@ -11,6 +11,8 @@ from as_agent_registry_service import (
     update_agent as ars_update_agent,
     delete_agent as ars_delete_agent,
     get_agent_by_display_name as ars_get_agent_by_display_name,
+    create_authorization as ars_create_authorization,
+    delete_authorization as ars_delete_authorization,
 )
 import agent_engine_manager # For Vertex AI Agent Engine specific operations
 
@@ -82,6 +84,7 @@ def main():
             # AS Agent Registry Service actions
             "register_agent", "list_registry", "get_registered_agent",
             "update_registered_agent", "get_registered_agents_by_name", "unregister_agent",
+            "create_authorization", "delete_authorization",
             # Agent Engine Manager actions
             "list_deployed_agents", "undeploy_agent", "get_deployed_agent", "list_deployed_agents_by_name"
         ],
@@ -100,8 +103,12 @@ def main():
     parser.add_argument("--description", help="Agent description (for AS Agent Registry Service: register, update)")
     parser.add_argument("--tool_description", help="Tool description (for AS Agent Registry Service: register, update)")
     parser.add_argument("--adk_deployment_id", help="ADK deployment ID (for AS Agent Registry Service: register, update)")
-    parser.add_argument("--auth_id", help="Authorization ID (for AS Agent Registry Service: register, update)")
+    parser.add_argument("--auth_id", help="Authorization ID (for AS Agent Registry Service: register, update, create_authorization, delete_authorization)")
     parser.add_argument("--icon_uri", help="Icon URI for the agent (for AS Agent Registry Service: register, update)")
+    parser.add_argument("--oauth_client_id", help="OAuth Client ID for authorization")
+    parser.add_argument("--oauth_client_secret", help="OAuth Client Secret for authorization")
+    parser.add_argument("--oauth_auth_uri", help="OAuth Authorization URI for authorization")
+    parser.add_argument("--oauth_token_uri", help="OAuth Token URI for authorization")
     parser.add_argument("--api_location", help="API location for AS Agent Registry Service (default: global)")
     parser.add_argument("--re_location", help="Reasoning Engine location for AS Agent Registry Service (default: global)")
 
@@ -128,6 +135,8 @@ def main():
             "  update_registered_agent\n"
             "  get_registered_agents_by_name\n"
             "  unregister_agent\n"
+            "  create_authorization\n"
+            "  delete_authorization\n"
             "Action: "
         ).strip()
 
@@ -222,6 +231,33 @@ def main():
                 print(json.dumps(result, indent=2))
             else:
                 print("Unregistering agent cancelled.")
+
+        elif action == "create_authorization":
+            project_id = get_parameter("project_id", config, args, "Enter Google Cloud Project ID", required=True)
+            auth_id = get_parameter("auth_id", config, args, "Enter Authorization ID to create", required=True)
+            oauth_client_id = get_parameter("oauth_client_id", config, args, "Enter OAuth Client ID", required=True)
+            oauth_client_secret = get_parameter("oauth_client_secret", config, args, "Enter OAuth Client Secret", required=True)
+            oauth_auth_uri = get_parameter("oauth_auth_uri", config, args, "Enter OAuth Authorization URI", required=True)
+            oauth_token_uri = get_parameter("oauth_token_uri", config, args, "Enter OAuth Token URI", required=True)
+            api_location = get_parameter("api_location", config, args, "Enter API location (optional, default: global)", default="global")
+
+            result = ars_create_authorization(
+                project_id, auth_id, oauth_client_id, oauth_client_secret,
+                oauth_auth_uri, oauth_token_uri, api_location=api_location
+            )
+            print(json.dumps(result, indent=2))
+
+        elif action == "delete_authorization":
+            project_id = get_parameter("project_id", config, args, "Enter Google Cloud Project ID", required=True)
+            auth_id = get_parameter("auth_id", config, args, "Enter Authorization ID to delete", required=True)
+            api_location = get_parameter("api_location", config, args, "Enter API location (optional, default: global)", default="global")
+
+            confirmation = input(f"Are you sure you want to delete authorization '{auth_id}'? (yes/no): ")
+            if confirmation.lower() == "yes":
+                result = ars_delete_authorization(project_id, auth_id, api_location=api_location)
+                print(json.dumps(result, indent=2))
+            else:
+                print("Deleting authorization cancelled.")
 
         # --- Agent Engine Manager Actions ---
         elif action == "list_deployed_agents":
